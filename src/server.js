@@ -1,16 +1,5 @@
 const Hapi = require("@hapi/hapi")
-const routes = [
-    {
-        method: "GET",
-        path: "/",
-        handler: () => {
-            return {
-                error: false,
-                message: "Server is up and running"
-            }
-        }
-    }
-]
+const albumsPlugin = require("./api/albums")
 
 const init = async () => {
     const server = Hapi.server({
@@ -23,7 +12,14 @@ const init = async () => {
         }
     })
 
-    server.route(routes)
+    await server.register([
+        {
+            plugin: albumsPlugin,
+            options: {
+                service: {}
+            }
+        }
+    ])
 
     await server.start()
     console.log(`Server running at: ${server.info.uri}`)
