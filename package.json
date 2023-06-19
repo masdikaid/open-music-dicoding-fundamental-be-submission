@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/server.js"
+    "start": "node ./src/server.js",
+    "migrate": "node-pg-migrate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.3.2",
-    "joi": "^17.9.2"
+    "dotenv": "^16.3.1",
+    "joi": "^17.9.2",
+    "node-pg-migrate": "^6.2.2",
+    "pg": "^8.11.0"
   }
 }
