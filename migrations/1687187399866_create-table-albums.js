@@ -23,7 +23,7 @@ exports.up = pgm => {
         updated_at: {
             type: 'TIMESTAMP',
             notNull: true,
-            default: pgm.func('current_timestamp')
+            default: new PgLiteral('current_timestamp')
         }
     })
 };
