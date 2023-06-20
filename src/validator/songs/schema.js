@@ -7,5 +7,4 @@ module.exports = Joi.object({
     year: Joi.number().integer().min(1900).max(2021).required(),
     duration: Joi.number().integer().min(0).max(1000).optional(),
     albumId: Joi.string().optional(),
-
 })

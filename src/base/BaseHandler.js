@@ -18,11 +18,12 @@ module.exports = class {
 
     _responseWithFailed({h, error}) {
         const isClientErr = error instanceof ClientError
+        const isDbErr = error.code === '23502' || error.code === '22P02'
         return this._response({
             h,
             status: 'fail',
-            message: isClientErr ? error.message : 'Maaf, terjadi kegagalan pada server kami',
-            code: isClientErr ? error.statusCode : 500
+            message: isClientErr ? error.message : isDbErr ? 'Data tidak sesuai' : 'Maaf, terjadi kegagalan pada server kami',
+            code: isClientErr ? error.statusCode : isDbErr ? 400 : 500
         })
     }
 

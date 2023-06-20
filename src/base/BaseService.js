@@ -1,5 +1,5 @@
 const {Pool} = require('pg');
-const InvariantError = require('../exceptions/InvariantError');
+const NotFoundError = require('../exceptions/NotFoundError');
 
 module.exports = class {
     constructor() {
@@ -8,7 +8,7 @@ module.exports = class {
 
     async _query({text, values, errWhenNoRows = true, notFoundMessage}) {
         const results = await this._pool.query({text, values})
-        if (!results.rows.length && errWhenNoRows) throw new InvariantError(notFoundMessage)
+        if (!results.rows.length && errWhenNoRows) throw new NotFoundError(notFoundMessage)
         return results.rows
     }
 }

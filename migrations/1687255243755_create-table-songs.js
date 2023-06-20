@@ -3,7 +3,7 @@ const {PgLiteral} = require('node-pg-migrate');
 exports.up = pgm => {
     pgm.createTable('songs', {
         id: {
-            type: 'uuid',
+            type: 'VARCHAR(50)',
             primaryKey: true,
             default: new PgLiteral('uuid_generate_v4()')
         },
@@ -29,7 +29,7 @@ exports.up = pgm => {
             default: null
         },
         album_id: {
-            type: 'uuid',
+            type: 'VARCHAR(50)',
             notNull: false,
             references: '"albums"',
             onDelete: 'cascade',

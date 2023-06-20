@@ -51,6 +51,7 @@ module.exports = class extends BaseHandler {
 
     putSongByIdHandler = async (request, h) => {
         try {
+            this._validator(request.payload)
             const {id} = request.params
             const {title, year, performer, genre, duration, albumId} = request.payload
             await this._service.editSongById(id, {title, year, performer, genre, duration, albumId})
