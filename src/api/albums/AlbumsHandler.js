@@ -2,9 +2,7 @@ const BaseHandler = require('../../base/BaseHandler')
 
 module.exports = class extends BaseHandler {
     constructor(service, validator) {
-        super()
-        this._service = service
-        this._validator = validator
+        super(service, validator)
     }
 
     getAlbumByIdHandler = async (request, h) => {
