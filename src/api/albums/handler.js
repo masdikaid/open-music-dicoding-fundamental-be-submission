@@ -1,7 +1,8 @@
-const ClientError = require('../../exceptions/ClientError')
+const BaseHandler = require('../../base/BaseHandler')
 
-module.exports = class {
+module.exports = class extends BaseHandler {
     constructor(service, validator) {
+        super()
         this._service = service
         this._validator = validator
     }
@@ -10,20 +11,13 @@ module.exports = class {
         try {
             const {id} = request.params
             const album = await this._service.getAlbumById(id)
-            return h.response({
-                status: 'success',
-                message: 'detail album berhasil ditemukan',
-                data: {
-                    album
-                }
-            }).code(200)
-        } catch (e) {
-            console.log(e)
-            const isClientErr = e instanceof ClientError
-            return h.response({
-                status: 'failed',
-                message: isClientErr ? e.message : 'Maaf, terjadi kegagalan pada server kami'
-            }).code(isClientErr ? e.statusCode : 500)
+            return this._responseWithSuccess({
+                h,
+                message: 'Album berhasil ditemukan',
+                data: {album}
+            })
+        } catch (error) {
+            return this._responseWithFailed({h, error})
         }
     }
 
@@ -32,19 +26,14 @@ module.exports = class {
             this._validator(request.payload)
             const {name, year} = request.payload
             const albumId = await this._service.addAlbum({name, year})
-            return h.response({
-                status: 'success',
+            return this._responseWithSuccess({
+                h,
                 message: 'Album berhasil ditambahkan',
-                data: {
-                    albumId
-                }
-            }).code(201)
-        } catch (e) {
-            const isClientErr = e instanceof ClientError
-            return h.response({
-                status: 'failed',
-                message: isClientErr ? e.message : 'Maaf, terjadi kegagalan pada server kami'
-            }).code(isClientErr ? e.statusCode : 500)
+                data: {albumId},
+                code: 201
+            })
+        } catch (error) {
+            return this._responseWithFailed({h, error})
         }
     }
 
@@ -53,16 +42,12 @@ module.exports = class {
             const {id} = request.params
             const {name, year} = request.payload
             await this._service.editAlbumById(id, {name, year})
-            return h.response({
-                status: 'success',
+            return this._responseWithSuccess({
+                h,
                 message: 'Album berhasil diperbarui'
-            }).code(200)
-        } catch (e) {
-            const isClientErr = e instanceof ClientError
-            return h.response({
-                status: 'failed',
-                message: isClientErr ? e.message : 'Maaf, terjadi kegagalan pada server kami'
-            }).code(isClientErr ? e.statusCode : 500)
+            })
+        } catch (error) {
+            return this._responseWithFailed({h, error})
         }
     }
 
@@ -74,12 +59,8 @@ module.exports = class {
                 status: 'success',
                 message: 'Album berhasil dihapus'
             }).code(200)
-        } catch (e) {
-            const isClientErr = e instanceof ClientError
-            return h.response({
-                status: 'failed',
-                message: isClientErr ? e.message : 'Maaf, terjadi kegagalan pada server kami'
-            }).code(isClientErr ? e.statusCode : 500)
+        } catch (error) {
+            return this._responseWithFailed({h, error})
         }
     }
 }
