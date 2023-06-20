@@ -16,10 +16,39 @@ module.exports = class {
     }
 
     async getAlbumById(id) {
+        /*get album id, name, year, and song list with id, title and performer*/
         const results = await this._pool.query({
-            text: 'SELECT id, name, year FROM albums WHERE id = $1',
+            text: `SELECT
+                        a.id,
+                        a.name,
+                        a.year,
+                        (
+                            SELECT
+                                COALESCE(
+                                    JSON_AGG(
+                                        JSON_BUILD_OBJECT(
+                                            'id', s.id,
+                                            'title', s.title,
+                                            'performer', s.performer
+                                        )
+                                ),
+                            '[]'
+                        )
+                    FROM
+                        songs s
+                    WHERE
+                        s.album_id = a.id
+                        ) AS songs
+                    FROM
+                        albums a
+                    LEFT JOIN songs s ON s.album_id = a.id
+                    WHERE
+                        a.id = $1
+                    GROUP BY
+                        a.id, a.name, a.year`,
             values: [id]
         })
+
 
         if (!results.rows.length) throw new InvariantError('Album tidak ditemukan')
         return results.rows[0]

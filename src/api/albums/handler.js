@@ -18,6 +18,7 @@ module.exports = class {
                 }
             }).code(200)
         } catch (e) {
+            console.log(e)
             const isClientErr = e instanceof ClientError
             return h.response({
                 status: 'failed',
