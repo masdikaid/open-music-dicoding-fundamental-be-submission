@@ -1,23 +1,20 @@
-const {Pool} = require('pg')
-const InvariantError = require('../../exceptions/InvariantError')
-module.exports = class {
+const BaseService = require('../../base/BaseService')
+module.exports = class extends BaseService {
     constructor() {
-        this._pool = new Pool()
+        super()
     }
 
     async addAlbum({name, year}) {
-        const results = await this._pool.query({
+        const results = await this._query({
             text: 'INSERT INTO albums(name, year) VALUES($1, $2) RETURNING id',
-            values: [name, year]
+            values: [name, year],
+            notFoundMessage: 'Gagal menambahkan album'
         })
-
-        if (!results.rows.length) throw new InvariantError('Album gagal ditambahkan')
-        return results.rows[0].id
+        return results[0].id
     }
 
     async getAlbumById(id) {
-        /*get album id, name, year, and song list with id, title and performer*/
-        const results = await this._pool.query({
+        const results = await this._query({
             text: `SELECT
                         a.id,
                         a.name,
@@ -46,29 +43,25 @@ module.exports = class {
                         a.id = $1
                     GROUP BY
                         a.id, a.name, a.year`,
-            values: [id]
+            values: [id],
+            notFoundMessage: 'Album tidak ditemukan'
         })
-
-
-        if (!results.rows.length) throw new InvariantError('Album tidak ditemukan')
-        return results.rows[0]
+        return results[0]
     }
 
     async editAlbumById(id, {name, year}) {
-        const results = await this._pool.query({
+        await this._query({
             text: 'UPDATE albums SET name = $1, year = $2, updated_at = current_timestamp WHERE id = $3 RETURNING id',
-            values: [name, year, id]
+            values: [name, year, id],
+            notFoundMessage: 'Gagal memperbarui album. album tidak ditemukan'
         })
-
-        if (!results.rows.length) throw new InvariantError('Gagal memperbarui album. Id tidak ditemukan')
     }
 
     async deleteAlbumById(id) {
-        const results = await this._pool.query({
+        const results = await this._query({
             text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
-            values: [id]
+            values: [id],
+            notFoundMessage: 'Gagal menghapus album. album tidak ditemukan'
         })
-
-        if (!results.rows.length) throw new InvariantError('Gagal menghapus album. Id tidak ditemukan')
     }
 }
