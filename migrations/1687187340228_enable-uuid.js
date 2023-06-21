@@ -1,11 +1,11 @@
 exports.up = pgm => {
-    // pgm.createExtension('uuid-ossp', {
-    //     ifNotExists: true
-    // })
+    pgm.createExtension('uuid-ossp', {
+        ifNotExists: true,
+    });
 };
 
 exports.down = pgm => {
-    // pgm.dropExtension('uuid-ossp', {
-    //     ifExists: true
-    // })
+    pgm.dropExtension('uuid-ossp', {
+        ifExists: true,
+    });
 };
