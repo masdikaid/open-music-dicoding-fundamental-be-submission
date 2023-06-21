@@ -1,5 +1,3 @@
-const ClientError = require('../exceptions/ClientError');
-
 module.exports = class {
   constructor(service, validator) {
     this._service = service;
