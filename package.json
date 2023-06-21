@@ -1,11 +1,11 @@
 {
   "name": "open-music-dicoding-fundamental-be",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src/server.js",
     "start": "node ./src/server.js",
+    "lint": "eslint ./src",
     "migrate": "node-pg-migrate"
   },
   "keywords": [],
@@ -19,6 +19,9 @@
     "pg": "^8.11.0"
   },
   "devDependencies": {
+    "eslint": "^8.43.0",
+    "eslint-config-google": "^0.14.0",
     "nodemon": "^2.0.22"
-  }
+  },
+  "description": ""
 }
