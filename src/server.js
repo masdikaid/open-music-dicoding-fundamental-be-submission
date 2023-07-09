@@ -19,7 +19,7 @@ const UsersService = require('./services/postgres/UsersService');
 const AuthenticationsService = require('./services/postgres/AuthService');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const SongsPlaylistService = require(
-    './services/postgres/SongsPlaylistService');
+  './services/postgres/SongsPlaylistService');
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -69,6 +69,7 @@ const init = async () => {
       plugin: albumsPlugin,
       options: {
         service: albumsService,
+        songsService: songsService,
         validator: albumsValidator,
       },
     },
@@ -117,8 +118,6 @@ const init = async () => {
       }
 
       if (response.isServer) h.continue;
-
-      console.error(response);
 
       let statusCode;
       let message;

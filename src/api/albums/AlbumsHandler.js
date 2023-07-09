@@ -1,17 +1,25 @@
 const BaseHandler = require('../../base/BaseHandler');
-
+const autoBind = require('auto-bind');
 module.exports = class extends BaseHandler {
-  constructor(service, validator) {
+  constructor(service, songService, validator) {
     super(service, validator);
+    this._songService = songService;
+    autoBind(this);
   }
 
   getAlbumByIdHandler = async (request, h) => {
     const {id} = request.params;
     const album = await this._service.getAlbumById(id);
+    const songs = await this._songService.getSongsByAlbumId(id);
     return this._responseWithSuccess({
       h,
       message: 'Album berhasil ditemukan',
-      data: {album},
+      data: {
+        album: {
+          ...album,
+          songs,
+        },
+      },
     });
   };
 

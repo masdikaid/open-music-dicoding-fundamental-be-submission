@@ -13,6 +13,7 @@ module.exports = class extends BaseService {
       values: [playlistId, songId],
       notFoundMessage: 'Gagal menambahkan lagu ke playlist',
     });
+
     return result[0].id;
   }
 

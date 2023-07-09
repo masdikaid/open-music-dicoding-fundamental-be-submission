@@ -12,6 +12,7 @@ module.exports = class extends BaseService {
       values: [name, owner],
       notFoundMessage: 'Gagal menambahkan playlist',
     });
+
     return result[0].id;
   }
 
@@ -47,6 +48,7 @@ module.exports = class extends BaseService {
       values: [id],
       notFoundMessage: 'Playlist tidak ditemukan',
     });
+
     return result[0];
   }
 

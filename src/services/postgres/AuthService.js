@@ -12,26 +12,27 @@ module.exports = class extends BaseService {
       values: [token],
       errWhenNoRows: false,
     };
+
     await this._query(query);
   }
 
   async verifyRefreshToken(token) {
-    const query = {
+    const results = await this._query({
       text: 'SELECT token FROM authentications WHERE token = $1',
       values: [token],
       errWhenNoRows: false,
-    };
-    const results = await this._query(query);
+    });
+
     if (!results.length) throw new InvariantError('Refresh token tidak valid');
   }
 
   async deleteRefreshToken(token) {
     await this.verifyRefreshToken(token);
-    const query = {
+
+    await this._query({
       text: 'DELETE FROM authentications WHERE token = $1',
       values: [token],
       errWhenNoRows: false,
-    };
-    await this._query(query);
+    });
   }
 };

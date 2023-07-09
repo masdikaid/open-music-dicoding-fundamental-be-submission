@@ -16,6 +16,7 @@ module.exports = class extends BaseService {
 
   async addUser({username, password, fullname}) {
     const hashedPassword = await Bycrypt.hash(password, 10);
+
     const results = await this._query({
       text: `INSERT INTO users(username, password, fullname) 
             VALUES($1, $2, $3) 
@@ -23,6 +24,7 @@ module.exports = class extends BaseService {
       values: [username, hashedPassword, fullname],
       notFoundMessage: 'Gagal menambahkan user',
     });
+
     return results[0].id;
   }
 
@@ -32,11 +34,14 @@ module.exports = class extends BaseService {
       values: [id],
       notFoundMessage: 'User tidak ditemukan',
     });
+
     return results[0];
   }
 
   async getUserByUsername(
-      username, withErrWhenNotFound = true, withPassword = false) {
+    username,
+    withErrWhenNotFound = true,
+    withPassword = false) {
     const results = await this._query({
       text: `SELECT id, username, fullname ${withPassword ? ', password' : ''} 
             FROM users 
@@ -45,6 +50,7 @@ module.exports = class extends BaseService {
       errWhenNoRows: withErrWhenNotFound,
       notFoundMessage: 'User tidak ditemukan',
     });
+
     return results[0];
   }
 
