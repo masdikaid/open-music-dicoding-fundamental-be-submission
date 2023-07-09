@@ -20,6 +20,7 @@ module.exports = class {
       throw new NotFoundError(
           notFoundMessage);
     }
+
     return results.rows;
   }
 };

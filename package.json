@@ -6,6 +6,7 @@
     "dev": "nodemon ./src/server.js",
     "start": "node ./src/server.js",
     "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
     "migrate": "node-pg-migrate"
   },
   "keywords": [],
@@ -13,6 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.3.2",
+    "@hapi/jwt": "^3.2.0",
+    "auto-bind": "^4.0.0",
+    "bcrypt": "^5.0.1",
     "dotenv": "^16.3.1",
     "joi": "^17.9.2",
     "node-pg-migrate": "^6.2.2",
@@ -21,7 +25,7 @@
   "devDependencies": {
     "eslint": "^8.43.0",
     "eslint-config-google": "^0.14.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^1.14.9"
   },
   "description": ""
 }

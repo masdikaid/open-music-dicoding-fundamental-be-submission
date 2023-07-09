@@ -9,9 +9,10 @@ module.exports = class extends BaseService {
     if (title) query += ` WHERE LOWER(title) LIKE '%${title.toLowerCase()}%'`;
     if (performer) {
       query += title ?
-          ` AND LOWER(performer) LIKE '%${performer.toLowerCase()}%'` :
-          ` WHERE LOWER(performer) LIKE '%${performer.toLowerCase()}%'`;
+        ` AND LOWER(performer) LIKE '%${performer.toLowerCase()}%'` :
+        ` WHERE LOWER(performer) LIKE '%${performer.toLowerCase()}%'`;
     }
+
     return await this._query({
       text: query,
       errWhenNoRows: false,
@@ -32,7 +33,21 @@ module.exports = class extends BaseService {
       values: [id],
       notFoundMessage: 'Lagu tidak ditemukan',
     });
+
     return results[0];
+  }
+
+  async getSongsByAlbumId(albumId) {
+    return await this._query({
+      text: `SELECT 
+                id, 
+                title, 
+                performer 
+                FROM songs 
+                WHERE album_id = $1`,
+      values: [albumId],
+      errWhenNoRows: false,
+    });
   }
 
   async addSong({title, year, performer, genre, duration, albumId}) {
@@ -43,6 +58,7 @@ module.exports = class extends BaseService {
       values: [title, year, performer, genre, duration, albumId],
       notFoundMessage: 'Gagal menambahkan lagu',
     });
+
     return results[0].id;
   }
 

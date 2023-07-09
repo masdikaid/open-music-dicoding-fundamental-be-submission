@@ -10,42 +10,17 @@ module.exports = class extends BaseService {
       values: [name, year],
       notFoundMessage: 'Gagal menambahkan album',
     });
+
     return results[0].id;
   }
 
   async getAlbumById(id) {
     const results = await this._query({
-      text: `SELECT
-                        a.id,
-                        a.name,
-                        a.year,
-                        (
-                            SELECT
-                                COALESCE(
-                                    JSON_AGG(
-                                        JSON_BUILD_OBJECT(
-                                            'id', s.id,
-                                            'title', s.title,
-                                            'performer', s.performer
-                                        )
-                                ),
-                            '[]'
-                        )
-                    FROM
-                        songs s
-                    WHERE
-                        s.album_id = a.id
-                        ) AS songs
-                    FROM
-                        albums a
-                    LEFT JOIN songs s ON s.album_id = a.id
-                    WHERE
-                        a.id = $1
-                    GROUP BY
-                        a.id, a.name, a.year`,
+      text: `SELECT id, name, year FROM albums WHERE id = $1`,
       values: [id],
       notFoundMessage: 'Album tidak ditemukan',
     });
+
     return results[0];
   }
 
