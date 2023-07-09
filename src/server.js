@@ -22,9 +22,9 @@ const AuthenticationsService = require('./services/postgres/AuthService');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const ActivitiesService = require('./services/postgres/ActivitiesService');
 const CollaborationsService = require(
-  './services/postgres/CollaborationsService');
+    './services/postgres/CollaborationsService');
 const SongsPlaylistService = require(
-  './services/postgres/SongsPlaylistService');
+    './services/postgres/SongsPlaylistService');
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
