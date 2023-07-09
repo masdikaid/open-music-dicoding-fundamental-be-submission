@@ -8,18 +8,22 @@ const SongsPlugin = require('./api/songs');
 const usersPlugin = require('./api/users');
 const authPlugin = require('./api/authentications');
 const playlistsPlugin = require('./api/playlists');
+const collaborationsPlugin = require('./api/collaborations');
 const albumsValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
 const usersValidator = require('./validator/users');
 const authenticationsValidator = require('./validator/authentications');
 const playlistsValidator = require('./validator/playlists');
+const collaborationsValidator = require('./validator/collaborations');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const SongsService = require('./services/postgres/SongsService');
 const UsersService = require('./services/postgres/UsersService');
 const AuthenticationsService = require('./services/postgres/AuthService');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
+const CollaborationsService = require(
+    './services/postgres/CollaborationsService');
 const SongsPlaylistService = require(
-  './services/postgres/SongsPlaylistService');
+    './services/postgres/SongsPlaylistService');
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -29,6 +33,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const playlistsService = new PlaylistsService();
   const songsPlaylistService = new SongsPlaylistService();
+  const collaborationsService = new CollaborationsService();
 
   const server = Hapi.server({
     port: process.env.PORT || 3000,
@@ -102,7 +107,17 @@ const init = async () => {
         service: playlistsService,
         songsPlaylistService: songsPlaylistService,
         songsService: songsService,
+        collaboratorService: collaborationsService,
         validator: playlistsValidator,
+      },
+    },
+    {
+      plugin: collaborationsPlugin,
+      options: {
+        service: collaborationsService,
+        playlistsService: playlistsService,
+        usersService: usersService,
+        validator: collaborationsValidator,
       },
     },
   ]);

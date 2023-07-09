@@ -16,7 +16,8 @@ module.exports = class extends BaseService {
     return result[0].id;
   }
 
-  async verifyPlaylistAccess(playlistId, credentialId) {
+  async verifyPlaylistAccess(
+      playlistId, credentialId, errWhenUnverified = true) {
     const playlist = await this._query({
       text: 'SELECT owner FROM playlists WHERE id = $1',
       values: [playlistId],
@@ -24,16 +25,25 @@ module.exports = class extends BaseService {
     });
 
     if (playlist[0].owner !== credentialId) {
-      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+      if (errWhenUnverified) {
+        throw new AuthorizationError(
+            'Anda tidak berhak mengakses resource ini');
+      } else {
+        return false;
+      }
+    } else {
+      return true;
     }
   }
 
   async getPlaylists(owner) {
     return await this._query({
-      text: `SELECT playlists.id, playlists.name, users.username 
-            FROM playlists 
-            LEFT JOIN users ON users.id = playlists.owner 
-            WHERE playlists.owner = $1`,
+      text: `SELECT playlists.id, playlists.name, users.username
+            FROM playlists
+            LEFT JOIN users ON users.id = playlists.owner
+            LEFT JOIN collaborations 
+            ON collaborations.playlist_id = playlists.id
+            WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
       values: [owner],
       errWhenNoRows: false,
     });

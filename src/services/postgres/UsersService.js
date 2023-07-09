@@ -39,9 +39,9 @@ module.exports = class extends BaseService {
   }
 
   async getUserByUsername(
-    username,
-    withErrWhenNotFound = true,
-    withPassword = false) {
+      username,
+      withErrWhenNotFound = true,
+      withPassword = false) {
     const results = await this._query({
       text: `SELECT id, username, fullname ${withPassword ? ', password' : ''} 
             FROM users 

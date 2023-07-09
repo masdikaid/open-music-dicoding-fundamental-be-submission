@@ -10,7 +10,7 @@ module.exports = class extends BaseService {
       values: [name, year],
       notFoundMessage: 'Gagal menambahkan album',
     });
-    
+
     return results[0].id;
   }
 

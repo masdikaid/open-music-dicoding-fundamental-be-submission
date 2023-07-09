@@ -2,10 +2,13 @@ const BaseHandler = require('../../base/BaseHandler');
 const autoBind = require('auto-bind');
 
 module.exports = class extends BaseHandler {
-  constructor(service, songsPlaylistService, songsService, validator) {
+  constructor(
+      service, songsPlaylistService, songsService, collaboratorService,
+      validator) {
     super(service, validator);
     this._songsPlaylistService = songsPlaylistService;
     this._songsService = songsService;
+    this._collaboratorService = collaboratorService;
     autoBind(this);
   }
 
@@ -38,7 +41,13 @@ module.exports = class extends BaseHandler {
   async getPlaylistByIdHandler(request, h) {
     const {id: credentialId} = request.auth.credentials;
     const {playlistId} = request.params;
-    await this._service.verifyPlaylistAccess(playlistId, credentialId);
+
+    if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
+        false)) {
+      await this._collaboratorService.verifyCollaborator(playlistId,
+          credentialId);
+    }
+
     const playlist = await this._service.getPlaylistById(playlistId);
     return h.response({
       status: 'success',
@@ -66,7 +75,13 @@ module.exports = class extends BaseHandler {
     const {songId} = request.payload;
 
     await this._songsService.getSongById(songId);
-    await this._service.verifyPlaylistAccess(playlistId, credentialId);
+
+    if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
+        false)) {
+      await this._collaboratorService.verifyCollaborator(playlistId,
+          credentialId);
+    }
+
     await this._songsPlaylistService.addSongPlaylist(playlistId, songId);
     return h.response({
       status: 'success',
@@ -78,7 +93,12 @@ module.exports = class extends BaseHandler {
     const {id: credentialId} = request.auth.credentials;
     const {playlistId} = request.params;
 
-    await this._service.verifyPlaylistAccess(playlistId, credentialId);
+    if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
+        false)) {
+      await this._collaboratorService.verifyCollaborator(playlistId,
+          credentialId);
+    }
+
     const playlist = await this._service.getPlaylistById(playlistId);
     const songs = await this._songsPlaylistService.getSongsPlaylist(playlistId);
     return h.response({
@@ -98,7 +118,12 @@ module.exports = class extends BaseHandler {
     const {playlistId} = request.params;
     const {songId} = request.payload;
 
-    await this._service.verifyPlaylistAccess(playlistId, credentialId);
+    if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
+        false)) {
+      await this._collaboratorService.verifyCollaborator(playlistId,
+          credentialId);
+    }
+
     await this._songsPlaylistService.deleteSongPlaylist(playlistId, songId);
     return h.response({
       status: 'success',
