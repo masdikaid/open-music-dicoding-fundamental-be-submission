@@ -1,14 +1,12 @@
 const BaseHandler = require('../../base/BaseHandler');
+const autoBind = require('auto-bind');
 
 module.exports = class extends BaseHandler {
   constructor(service, userService, tokenManager, validator) {
     super(service, validator);
     this._userService = userService;
     this._tokenManager = tokenManager;
-
-    this.loginHandler = this.loginHandler.bind(this);
-    this.refreshTokenHandler = this.refreshTokenHandler.bind(this);
-    this.logoutHandler = this.logoutHandler.bind(this);
+    autoBind(this);
   }
 
   async loginHandler(request, h) {

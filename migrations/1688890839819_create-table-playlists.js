@@ -1,22 +1,21 @@
 /* eslint-disable camelcase */
+
 const {PgLiteral} = require('node-pg-migrate');
+exports.shorthands = undefined;
+
 exports.up = pgm => {
-  pgm.createTable('users', {
+  pgm.createTable('playlists', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
       default: new PgLiteral('uuid_generate_v4()'),
     },
-    username: {
+    name: {
       type: 'VARCHAR(50)',
       notNull: true,
     },
-    password: {
-      type: 'TEXT',
-      notNull: true,
-    },
-    fullname: {
-      type: 'TEXT',
+    owner: {
+      type: 'VARCHAR(50)',
       notNull: true,
     },
     created_at: {
@@ -31,10 +30,10 @@ exports.up = pgm => {
     },
   });
 
-  pgm.addConstraint('users', 'unique_username', 'UNIQUE(username)');
-  pgm.createIndex('users', 'username');
+  pgm.addConstraint('playlists', 'fk_playlists.owner_users.id',
+    'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE');
 };
 
 exports.down = pgm => {
-  pgm.dropTable('users');
+  pgm.dropTable('playlists');
 };

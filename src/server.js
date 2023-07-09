@@ -1,19 +1,25 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 const tokenManager = require('./tokenize/TokenManager');
 const albumsPlugin = require('./api/albums');
 const SongsPlugin = require('./api/songs');
 const usersPlugin = require('./api/users');
 const authPlugin = require('./api/authentications');
+const playlistsPlugin = require('./api/playlists');
 const albumsValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
 const usersValidator = require('./validator/users');
 const authenticationsValidator = require('./validator/authentications');
+const playlistsValidator = require('./validator/playlists');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const SongsService = require('./services/postgres/SongsService');
 const UsersService = require('./services/postgres/UsersService');
 const AuthenticationsService = require('./services/postgres/AuthService');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
+const SongsPlaylistService = require(
+    './services/postgres/SongsPlaylistService');
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -21,6 +27,8 @@ const init = async () => {
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
+  const playlistsService = new PlaylistsService();
+  const songsPlaylistService = new SongsPlaylistService();
 
   const server = Hapi.server({
     port: process.env.PORT || 3000,
@@ -30,6 +38,30 @@ const init = async () => {
         origin: ['*'],
       },
     },
+  });
+
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  server.auth.strategy('musicsapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+        username: artifacts.decoded.payload.username,
+        fullname: artifacts.decoded.payload.fullname,
+      },
+    }),
   });
 
   await server.register([
@@ -63,6 +95,15 @@ const init = async () => {
         tokenManager: tokenManager,
       },
     },
+    {
+      plugin: playlistsPlugin,
+      options: {
+        service: playlistsService,
+        songsPlaylistService: songsPlaylistService,
+        songsService: songsService,
+        validator: playlistsValidator,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
@@ -77,6 +118,8 @@ const init = async () => {
 
       if (response.isServer) h.continue;
 
+      console.error(response);
+
       let statusCode;
       let message;
       switch (response.code) {
@@ -85,8 +128,9 @@ const init = async () => {
           message = 'Username sudah digunakan';
           break;
         default:
-          statusCode = 500;
-          message = 'Maaf, terjadi kegagalan pada server kami.';
+          statusCode = response.output.statusCode || 500;
+          message = response.message ||
+            'Maaf, terjadi kegagalan pada server kami';
           break;
       }
 
