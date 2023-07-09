@@ -3,12 +3,17 @@ const autoBind = require('auto-bind');
 
 module.exports = class extends BaseHandler {
   constructor(
-      service, songsPlaylistService, songsService, collaboratorService,
-      validator) {
+    service,
+    songsPlaylistService,
+    songsService,
+    collaboratorService,
+    activitiesService,
+    validator) {
     super(service, validator);
     this._songsPlaylistService = songsPlaylistService;
     this._songsService = songsService;
     this._collaboratorService = collaboratorService;
+    this._activitiesService = activitiesService;
     autoBind(this);
   }
 
@@ -43,9 +48,10 @@ module.exports = class extends BaseHandler {
     const {playlistId} = request.params;
 
     if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
-        false)) {
-      await this._collaboratorService.verifyCollaborator(playlistId,
-          credentialId);
+      false)) {
+      await this._collaboratorService.verifyCollaborator(
+        playlistId,
+        credentialId);
     }
 
     const playlist = await this._service.getPlaylistById(playlistId);
@@ -77,12 +83,20 @@ module.exports = class extends BaseHandler {
     await this._songsService.getSongById(songId);
 
     if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
-        false)) {
-      await this._collaboratorService.verifyCollaborator(playlistId,
-          credentialId);
+      false)) {
+      await this._collaboratorService.verifyCollaborator(
+        playlistId,
+        credentialId);
     }
 
     await this._songsPlaylistService.addSongPlaylist(playlistId, songId);
+
+    const activity = await this._activitiesService.addActivity(
+      playlistId,
+      songId,
+      credentialId,
+      'add');
+
     return h.response({
       status: 'success',
       message: 'Lagu berhasil ditambahkan ke playlist',
@@ -94,9 +108,10 @@ module.exports = class extends BaseHandler {
     const {playlistId} = request.params;
 
     if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
-        false)) {
-      await this._collaboratorService.verifyCollaborator(playlistId,
-          credentialId);
+      false)) {
+      await this._collaboratorService.verifyCollaborator(
+        playlistId,
+        credentialId);
     }
 
     const playlist = await this._service.getPlaylistById(playlistId);
@@ -119,15 +134,47 @@ module.exports = class extends BaseHandler {
     const {songId} = request.payload;
 
     if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
-        false)) {
-      await this._collaboratorService.verifyCollaborator(playlistId,
-          credentialId);
+      false)) {
+      await this._collaboratorService.verifyCollaborator(
+        playlistId,
+        credentialId);
     }
 
     await this._songsPlaylistService.deleteSongPlaylist(playlistId, songId);
+
+    const activity = await this._activitiesService.addActivity(
+      playlistId,
+      songId,
+      credentialId,
+      'delete');
+
     return h.response({
       status: 'success',
       message: 'Lagu berhasil dihapus dari playlist',
+    });
+  }
+
+  async getActivitiesByPlaylistIdHandler(request, h) {
+    const {id: credentialId} = request.auth.credentials;
+    const {playlistId} = request.params;
+
+    if (!await this._service.verifyPlaylistAccess(playlistId, credentialId,
+      false)) {
+      await this._collaboratorService.verifyCollaborator(
+        playlistId,
+        credentialId);
+    }
+
+    const activities = await this._activitiesService.getActivitiesByPlaylistId(
+      playlistId);
+
+    return h.response({
+      status: 'success',
+      message: 'Berhasil mendapatkan aktivitas',
+      data: {
+        playlistId,
+        activities,
+      },
     });
   }
 };

@@ -55,4 +55,12 @@ module.exports = (handler) => [
       auth: 'musicsapp_jwt',
     },
   },
+  {
+    method: 'GET',
+    path: '/playlists/{playlistId}/activities',
+    handler: handler.getActivitiesByPlaylistIdHandler,
+    options: {
+      auth: 'musicsapp_jwt',
+    },
+  },
 ];
