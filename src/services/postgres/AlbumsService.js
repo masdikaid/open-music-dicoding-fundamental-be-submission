@@ -20,12 +20,12 @@ module.exports = class extends BaseService {
   async getAlbumById(id) {
     const results = await this._query({
       text: `SELECT id, 
-						name, 
-						year, 
-						CASE WHEN cover_url IS NOT NULL 
-						THEN CONCAT('http://${process.env.HOST}:${process.env.PORT}/', cover_url) 
-						ELSE NULL END as "coverUrl"  
-						FROM albums WHERE id = $1`,
+        name, 
+        year, 
+        CASE WHEN cover_url IS NOT NULL 
+        THEN CONCAT('http://${process.env.HOST}:${process.env.PORT}/', cover_url) 
+        ELSE NULL END as "coverUrl"  
+        FROM albums WHERE id = $1`,
       values: [id],
       notFoundMessage: 'Album tidak ditemukan',
     });
@@ -66,7 +66,8 @@ module.exports = class extends BaseService {
     await this.getAlbumById(albumId);
 
     const results = await this._query({
-      text: 'INSERT INTO user_album_likes(user_id, album_id) VALUES($1, $2) RETURNING id',
+      text: `INSERT INTO user_album_likes(user_id, album_id) 
+        VALUES($1, $2) RETURNING id`,
       values: [userId, albumId],
       notFoundMessage: 'Gagal menyukai album',
     });
@@ -80,7 +81,9 @@ module.exports = class extends BaseService {
     await this.getAlbumById(albumId);
 
     await this._query({
-      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id',
+      text: `DELETE FROM user_album_likes 
+				WHERE user_id = $1 AND album_id = $2 
+        RETURNING id`,
       values: [userId, albumId],
       notFoundMessage: 'Gagal menyukai album',
     });
@@ -92,12 +95,13 @@ module.exports = class extends BaseService {
     try {
       const total = await this._cacheService.get(`album-likes:${albumId}`);
       return {cache: true, total: total};
-
     } catch (error) {
       await this.getAlbumById(albumId);
 
       const result = await this._query({
-        text: 'SELECT COUNT(*) as total FROM user_album_likes WHERE album_id = $1',
+        text: `SELECT COUNT(*) as total 
+					FROM user_album_likes 
+					WHERE album_id = $1`,
         values: [albumId],
         notFoundMessage: 'Gagal mendapatkan jumlah like album',
       });

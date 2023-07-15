@@ -22,7 +22,7 @@ module.exports = class extends BaseService {
   }
 
   async verifyPlaylistAccess(
-    playlistId, credentialId, errWhenUnverified = true) {
+      playlistId, credentialId, errWhenUnverified = true) {
     const playlist = await this._query({
       text: 'SELECT owner FROM playlists WHERE id = $1',
       values: [playlistId],
@@ -32,7 +32,7 @@ module.exports = class extends BaseService {
     if (playlist[0].owner !== credentialId) {
       if (errWhenUnverified) {
         throw new AuthorizationError(
-          'Anda tidak berhak mengakses resource ini');
+            'Anda tidak berhak mengakses resource ini');
       } else {
         return false;
       }
@@ -45,7 +45,6 @@ module.exports = class extends BaseService {
     try {
       const result = await this._cacheService.get(`playlists:${owner}`);
       return {cache: true, data: JSON.parse(result)};
-
     } catch (error) {
       const result = await this._query({
         text: `SELECT playlists.id, playlists.name, users.username

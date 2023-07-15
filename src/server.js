@@ -31,10 +31,10 @@ const CacheService = require('./services/redis/CacheService');
 const ExportsService = require('./services/rabbitmq/ProducerService');
 const StorageService = require('./services/storage/StorageService');
 const CollaborationsService = require(
-  './services/postgres/CollaborationsService',
+    './services/postgres/CollaborationsService',
 );
 const SongsPlaylistService = require(
-  './services/postgres/SongsPlaylistService',
+    './services/postgres/SongsPlaylistService',
 );
 
 const init = async () => {
@@ -49,7 +49,7 @@ const init = async () => {
   const activitiesService = new ActivitiesService();
   const exportsService = new ExportsService();
   const storageService = new StorageService(
-    path.resolve(__dirname, '../uploads'),
+      path.resolve(__dirname, '../uploads'),
   );
 
   const server = Hapi.server({

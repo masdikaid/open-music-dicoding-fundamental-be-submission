@@ -1,6 +1,5 @@
 const BaseHandler = require('../../base/BaseHandler');
 const autoBind = require('auto-bind');
-const {number} = require('joi');
 module.exports = class extends BaseHandler {
   constructor(service, songService, storageService, validator) {
     super(service, validator);
@@ -62,8 +61,8 @@ module.exports = class extends BaseHandler {
     const {id} = request.params;
     this._validator.validateAlbumsCoverPayload(cover.hapi.headers);
     const filename = await this._storageService.writeFile('images/albums',
-      cover,
-      cover.hapi);
+        cover,
+        cover.hapi);
 
     const urlPath = `uploads/images/albums/${filename}`;
     await this._service.addAlbumCover(id, urlPath);

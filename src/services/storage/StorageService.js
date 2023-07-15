@@ -16,7 +16,7 @@ module.exports = class {
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path, {recursive: true});
     }
-    
+
     const filePath = `${path}/${filename}`;
     const fileStream = fs.createWriteStream(filePath);
 
