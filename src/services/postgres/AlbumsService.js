@@ -16,12 +16,28 @@ module.exports = class extends BaseService {
 
   async getAlbumById(id) {
     const results = await this._query({
-      text: `SELECT id, name, year FROM albums WHERE id = $1`,
+      text: `SELECT id, 
+						name, 
+						year, 
+						CASE WHEN cover_url IS NOT NULL 
+						THEN CONCAT('http://${process.env.HOST}:${process.env.PORT}/', cover_url) 
+						ELSE NULL END as "coverUrl"  
+						FROM albums WHERE id = $1`,
       values: [id],
       notFoundMessage: 'Album tidak ditemukan',
     });
 
     return results[0];
+  }
+
+  async addAlbumCover(id, filename) {
+    const results = await this._query({
+      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      values: [filename, id],
+      notFoundMessage: 'Gagal memperbarui cover. album tidak ditemukan',
+    });
+
+    return results[0].id;
   }
 
   async editAlbumById(id, {name, year}) {
