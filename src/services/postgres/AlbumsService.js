@@ -1,7 +1,10 @@
 const BaseService = require('../../base/BaseService');
+const autoBind = require('auto-bind');
 module.exports = class extends BaseService {
-  constructor() {
+  constructor(cacheService) {
     super();
+    this._cacheService = cacheService;
+    autoBind(this);
   }
 
   async addAlbum({name, year}) {
@@ -61,32 +64,48 @@ module.exports = class extends BaseService {
 
   async likeAlbumById(userId, albumId) {
     await this.getAlbumById(albumId);
+
     const results = await this._query({
       text: 'INSERT INTO user_album_likes(user_id, album_id) VALUES($1, $2) RETURNING id',
       values: [userId, albumId],
       notFoundMessage: 'Gagal menyukai album',
     });
 
+    this._cacheService.delete(`album-likes:${albumId}`);
+
     return results[0].id;
   }
 
   async unlikeAlbumById(userId, albumId) {
     await this.getAlbumById(albumId);
+
     await this._query({
       text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id',
       values: [userId, albumId],
       notFoundMessage: 'Gagal menyukai album',
     });
+
+    this._cacheService.delete(`album-likes:${albumId}`);
   }
 
   async getAlbumLikesById(albumId) {
-    await this.getAlbumById(albumId);
-    const results = await this._query({
-      text: 'SELECT COUNT(*) as total FROM user_album_likes WHERE album_id = $1',
-      values: [albumId],
-      notFoundMessage: 'Gagal mendapatkan jumlah like album',
-    });
+    try {
+      const total = await this._cacheService.get(`album-likes:${albumId}`);
+      return {cache: true, total: total};
 
-    return results[0].total;
+    } catch (error) {
+      await this.getAlbumById(albumId);
+
+      const result = await this._query({
+        text: 'SELECT COUNT(*) as total FROM user_album_likes WHERE album_id = $1',
+        values: [albumId],
+        notFoundMessage: 'Gagal mendapatkan jumlah like album',
+      });
+
+      const total = result[0].total;
+      await this._cacheService.set(`album-likes:${albumId}`, total);
+
+      return {cache: false, total: total};
+    }
   }
 };

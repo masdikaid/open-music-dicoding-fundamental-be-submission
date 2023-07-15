@@ -1,9 +1,12 @@
 const BaseService = require('../../base/BaseService');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
+const autoBind = require('auto-bind');
 
 module.exports = class extends BaseService {
-  constructor() {
+  constructor(cacheService) {
     super();
+    this._cacheService = cacheService;
+    autoBind(this);
   }
 
   async addCollaboration({playlistId, userId}) {
@@ -14,6 +17,8 @@ module.exports = class extends BaseService {
       values: [playlistId, userId],
       notFoundMessage: 'Gagal menambahkan kolaborasi',
     });
+
+    this._cacheService.delete(`playlists:${userId}`);
 
     return result[0].id;
   }
@@ -26,6 +31,8 @@ module.exports = class extends BaseService {
       values: [playlistId, userId],
       notFoundMessage: 'Gagal menghapus kolaborasi',
     });
+
+    this._cacheService.delete(`playlists:${userId}`);
   }
 
   async verifyCollaborator(playlistId, userId) {

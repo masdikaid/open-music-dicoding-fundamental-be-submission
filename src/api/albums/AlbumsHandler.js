@@ -100,14 +100,18 @@ module.exports = class extends BaseHandler {
 
   getAlbumLikesByIdHandler = async (request, h) => {
     const {id} = request.params;
-    const likes = await this._service.getAlbumLikesById(id);
+    const {cache, total} = await this._service.getAlbumLikesById(id);
 
-    return this._responseWithSuccess({
+    const response = this._responseWithSuccess({
       h,
       message: 'Likes berhasil ditemukan',
       data: {
-        likes: parseInt(likes),
+        likes: parseInt(total, 10),
       },
     });
+
+    if (cache) response.header('X-Data-Source', 'cache');
+
+    return response;
   };
 };
