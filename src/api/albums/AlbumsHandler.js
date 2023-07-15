@@ -1,5 +1,6 @@
 const BaseHandler = require('../../base/BaseHandler');
 const autoBind = require('auto-bind');
+const {number} = require('joi');
 module.exports = class extends BaseHandler {
   constructor(service, songService, storageService, validator) {
     super(service, validator);
@@ -73,6 +74,39 @@ module.exports = class extends BaseHandler {
       code: 201,
       data: {
         coverUrl: `http://${process.env.HOST}:${process.env.PORT}/${urlPath}`,
+      },
+    });
+  };
+
+  likeAlbumByIdHandler = async (request, h) => {
+    const {id} = request.params;
+    const {id: credentialId} = request.auth.credentials;
+    await this._service.likeAlbumById(credentialId, id);
+    return this._responseWithSuccess({
+      h,
+      message: 'Album berhasil di like',
+    }).code(201);
+  };
+
+  unlikeAlbumByIdHandler = async (request, h) => {
+    const {id} = request.params;
+    const {id: credentialId} = request.auth.credentials;
+    await this._service.unlikeAlbumById(credentialId, id);
+    return this._responseWithSuccess({
+      h,
+      message: 'Album berhasil di unlike',
+    });
+  };
+
+  getAlbumLikesByIdHandler = async (request, h) => {
+    const {id} = request.params;
+    const likes = await this._service.getAlbumLikesById(id);
+
+    return this._responseWithSuccess({
+      h,
+      message: 'Likes berhasil ditemukan',
+      data: {
+        likes: parseInt(likes),
       },
     });
   };

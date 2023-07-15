@@ -32,4 +32,25 @@ module.exports = (handler) => [
     path: '/albums/{id}',
     handler: handler.deleteAlbumByIdHandler,
   },
+  {
+    method: 'GET',
+    path: '/albums/{id}/likes',
+    handler: handler.getAlbumLikesByIdHandler,
+  },
+  {
+    method: 'POST',
+    path: '/albums/{id}/likes',
+    handler: handler.likeAlbumByIdHandler,
+    options: {
+      auth: 'musicsapp_jwt',
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/albums/{id}/likes',
+    handler: handler.unlikeAlbumByIdHandler,
+    options: {
+      auth: 'musicsapp_jwt',
+    },
+  },
 ];

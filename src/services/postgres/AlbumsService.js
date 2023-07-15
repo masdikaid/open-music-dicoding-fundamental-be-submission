@@ -58,4 +58,35 @@ module.exports = class extends BaseService {
       notFoundMessage: 'Gagal menghapus album. album tidak ditemukan',
     });
   }
+
+  async likeAlbumById(userId, albumId) {
+    await this.getAlbumById(albumId);
+    const results = await this._query({
+      text: 'INSERT INTO user_album_likes(user_id, album_id) VALUES($1, $2) RETURNING id',
+      values: [userId, albumId],
+      notFoundMessage: 'Gagal menyukai album',
+    });
+
+    return results[0].id;
+  }
+
+  async unlikeAlbumById(userId, albumId) {
+    await this.getAlbumById(albumId);
+    await this._query({
+      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id',
+      values: [userId, albumId],
+      notFoundMessage: 'Gagal menyukai album',
+    });
+  }
+
+  async getAlbumLikesById(albumId) {
+    await this.getAlbumById(albumId);
+    const results = await this._query({
+      text: 'SELECT COUNT(*) as total FROM user_album_likes WHERE album_id = $1',
+      values: [albumId],
+      notFoundMessage: 'Gagal mendapatkan jumlah like album',
+    });
+
+    return results[0].total;
+  }
 };
