@@ -107,7 +107,7 @@ module.exports = class extends BaseService {
       });
 
       const total = result[0].total;
-      await this._cacheService.set(`album-likes:${albumId}`, total);
+      await this._cacheService.set(`album-likes:${albumId}`, total, 1800);
 
       return {cache: false, total: total};
     }
