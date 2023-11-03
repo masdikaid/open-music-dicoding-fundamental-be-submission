@@ -34,13 +34,20 @@ module.exports = class extends BaseHandler {
 
   async getPlaylistsHandler(request, h) {
     const {id: credentialId} = request.auth.credentials;
-    const playlists = await this._service.getPlaylists(credentialId);
-    return h.response({
+
+    const {cache, data: playlists} = await this._service.getPlaylists(
+        credentialId);
+
+    const response = h.response({
       status: 'success',
       data: {
         playlists,
       },
     });
+
+    if (cache) response.header('X-Data-Source', 'cache');
+
+    return response;
   }
 
   async getPlaylistByIdHandler(request, h) {

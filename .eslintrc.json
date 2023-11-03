@@ -9,6 +9,7 @@
     "ecmaVersion": "latest"
   },
   "rules": {
-    "require-jsdoc": "off"
+    "require-jsdoc": "off",
+    "no-tabs": "off"
   }
 }
